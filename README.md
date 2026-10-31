@@ -1,22 +1,64 @@
 # NetRescue — Interactive Computer Networks Laboratory
 
-A single-page, browser-based educational simulator.
+**Explore Routes. Simulate Failures. Build Resilient Networks.**
 
-## Modules
-1. **Routing algorithms:** Dijkstra and Bellman-Ford demonstrations, editable link weights, source/destination selection, and live shortest-path results.
-2. **Failure and recovery:** Click links to disconnect/restore them, switch routers off, and observe route recalculation.
-3. **Packet transmission:** Choose packet count, simulated packet-loss percentage and transmission speed setting; view delivery/drop results.
-4. **Performance analyzer:** View router/link availability, route cost, hop count, link utilization and packet delivery ratio.
+NetRescue is a browser-based interactive educational simulator designed to demonstrate important Computer Networks concepts through practical visual experiments.
 
-## Run
-Open `index.html` directly in Chrome, Edge, or Firefox. No installation, server, or internet connection is required.
+## 🚀 Project Modules
 
-## Publish with GitHub Pages
-1. Create a public GitHub repository named `NetRescue`.
-2. Upload `index.html` to the repository root.
-3. Open **Settings → Pages**.
-4. Choose **Deploy from a branch**, branch `main`, folder `/ (root)`, then Save.
-5. The published address will be `https://YOUR-USERNAME.github.io/NetRescue/`.
+### 1. Routing Algorithm Simulator
+- Demonstrates Dijkstra and Bellman-Ford shortest-path algorithms.
+- Allows users to select source and destination routers.
+- Supports editable link costs.
+- Displays shortest paths, total costs, and hop counts.
+- Provides algorithm comparison.
 
-## Academic scope
-This is a learning simulation, not a live network monitor. Routers, links, packets, loss and performance measurements are modeled in JavaScript in the browser. Link costs are abstract weights. The speed selector is included as a user-adjustable lab setting; packet delivery and loss are simulated.
+### 2. Network Failure and Recovery
+- Disconnect and restore network links.
+- Switch routers ON and OFF.
+- Observe how network failures affect connectivity.
+- Understand alternative route selection.
+
+### 3. Packet Transmission Simulator
+- Configure the number of packets.
+- Set a simulated packet-loss percentage.
+- Select transmission simulation speed.
+- View delivered and dropped packet counts.
+- Monitor packet transmission results.
+
+### 4. Network Performance Analyzer
+- Displays router availability.
+- Measures active network links.
+- Calculates route cost and hop count.
+- Shows packet delivery ratio.
+- Provides link utilization information.
+
+## 🛠️ Technologies Used
+
+- HTML5
+- CSS3
+- JavaScript
+- SVG for network topology visualization
+
+## 💻 How to Run Locally
+
+1. Download or clone this repository.
+2. Open the project folder.
+3. Open `index.html` in Chrome, Edge, or Firefox.
+4. Start exploring the interactive simulations.
+
+No additional installation or backend server is required.
+
+
+## 🎓 Academic Scope
+
+NetRescue is an educational simulation developed to help students understand routing algorithms, packet transmission, network failures, recovery, and performance analysis.
+
+All routers, links, packets, packet losses, and performance measurements are modeled using JavaScript in the browser. Link costs are abstract weights. The simulator does not monitor real network traffic or transmit actual packets.
+
+## 👨‍💻 Project Information
+
+**Project Name:** NetRescue  
+**Domain:** Computer Networks  
+**Project Type:** Interactive Web-Based Simulation  
+**Purpose:** Educational and Academic Demonstration

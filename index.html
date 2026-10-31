@@ -1,0 +1,1193 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetRescue | Network Resilience Simulator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0b1120;
+    color: #e5e7eb;
+    line-height: 1.6;
+}
+
+header {
+    background: #111c32;
+    padding: 25px 7%;
+    border-bottom: 1px solid #263653;
+}
+
+header h1 {
+    color: #38bdf8;
+    font-size: 30px;
+}
+
+header p {
+    color: #a8b5ca;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px 7%;
+    background: #101a2e;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+nav a {
+    color: #dbeafe;
+    text-decoration: none;
+    padding: 8px 13px;
+    border-radius: 6px;
+    background: #1d2c46;
+    font-size: 14px;
+}
+
+nav a:hover {
+    background: #0369a1;
+}
+
+.container {
+    width: 86%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+section {
+    padding: 35px 0;
+    scroll-margin-top: 80px;
+}
+
+h2 {
+    color: #38bdf8;
+    margin-bottom: 15px;
+}
+
+h3 {
+    color: #7dd3fc;
+    margin-bottom: 12px;
+}
+
+.card {
+    background: #142139;
+    padding: 22px;
+    border: 1px solid #263b5b;
+    border-radius: 12px;
+    margin: 15px 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    color: #cbd5e1;
+}
+
+input, select {
+    width: 100%;
+    padding: 11px;
+    background: #0b172b;
+    color: white;
+    border: 1px solid #405575;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+button {
+    background: #0284c7;
+    color: white;
+    border: none;
+    padding: 11px 17px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 5px 4px 5px 0;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #0369a1;
+}
+
+button.secondary {
+    background: #475569;
+}
+
+button.danger {
+    background: #dc2626;
+}
+
+button.success {
+    background: #15803d;
+}
+
+.result {
+    background: #0b172b;
+    border-left: 4px solid #38bdf8;
+    padding: 16px;
+    border-radius: 7px;
+    margin-top: 15px;
+    overflow-wrap: anywhere;
+}
+
+.good {
+    color: #4ade80;
+}
+
+.bad {
+    color: #f87171;
+}
+
+.muted {
+    color: #94a3b8;
+}
+
+.network {
+    background: #0b172b;
+    border-radius: 10px;
+    padding: 15px;
+    overflow-x: auto;
+}
+
+.network svg {
+    min-width: 550px;
+    width: 100%;
+    height: auto;
+}
+
+.edge {
+    stroke: #64748b;
+    stroke-width: 4;
+    cursor: pointer;
+}
+
+.edge.failed {
+    stroke: #ef4444;
+    stroke-dasharray: 8 6;
+}
+
+.edge.route {
+    stroke: #22c55e;
+    stroke-width: 7;
+}
+
+.router circle {
+    fill: #0369a1;
+    stroke: #7dd3fc;
+    stroke-width: 3;
+}
+
+.router.off circle {
+    fill: #991b1b;
+    stroke: #f87171;
+}
+
+.router text {
+    fill: white;
+    font-size: 13px;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+.edge-label {
+    fill: #f8fafc;
+    font-size: 13px;
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: #0b172b;
+    stroke-width: 4px;
+}
+
+.metric {
+    background: #1e3150;
+    padding: 18px;
+    border-radius: 9px;
+}
+
+.metric strong {
+    display: block;
+    font-size: 26px;
+    color: #38bdf8;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+td, th {
+    padding: 10px;
+    border-bottom: 1px solid #334155;
+    text-align: left;
+}
+
+th {
+    color: #7dd3fc;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    background: #111c32;
+    color: #94a3b8;
+    margin-top: 30px;
+}
+
+@media(max-width:600px) {
+    .container {
+        width: 92%;
+    }
+    header {
+        padding: 20px 4%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>NetRescue</h1>
+    <p>Interactive Network Routing and Resilience Simulator</p>
+</header>
+
+<nav>
+    <a href="#home">Home</a>
+    <a href="#routing">Routing</a>
+    <a href="#failure">Failure Simulation</a>
+    <a href="#packets">Packet Transmission</a>
+    <a href="#performance">Performance</a>
+</nav>
+
+<div class="container">
+
+<section id="home">
+    <h2>Network Resilience Simulation</h2>
+    <p>
+        NetRescue demonstrates how computer networks find routes,
+        handle link failures, recover connectivity and deliver packets.
+        It provides interactive simulations of routing algorithms
+        and network performance.
+    </p>
+
+    <div class="grid" style="margin-top:20px">
+        <div class="metric">
+            <strong>2</strong>
+            Routing Algorithms
+        </div>
+        <div class="metric">
+            <strong>6</strong>
+            Network Routers
+        </div>
+        <div class="metric">
+            <strong>5</strong>
+            Network Links
+        </div>
+        <div class="metric">
+            <strong>4</strong>
+            Simulation Modules
+        </div>
+    </div>
+</section>
+
+<section id="routing">
+    <h2>1. Routing Algorithm Simulator</h2>
+
+    <div class="card">
+        <h3>Network Topology</h3>
+        <p class="muted">
+            Green links show the calculated route. Red dashed links
+            indicate failed connections. Click a link in the failure
+            module to disconnect or restore it.
+        </p>
+        <div class="network">
+            <svg id="networkSvg" viewBox="0 0 650 330"
+                 role="img" aria-label="Interactive network topology">
+                <g id="edges"></g>
+                <g id="routers"></g>
+            </svg>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Configure Routing</h3>
+
+        <div class="grid">
+            <div>
+                <label>Source Router</label>
+                <select id="src">
+                    <option>R1</option>
+                    <option>R2</option>
+                    <option>R3</option>
+                    <option>R4</option>
+                    <option>R5</option>
+                    <option>R6</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Destination Router</label>
+                <select id="dst">
+                    <option>R6</option>
+                    <option>R1</option>
+                    <option>R2</option>
+                    <option>R3</option>
+                    <option>R4</option>
+                    <option>R5</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Routing Algorithm</label>
+                <select id="algo">
+                    <option value="dijkstra">Dijkstra</option>
+                    <option value="bellman">Bellman-Ford</option>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="calculateRoute()">Calculate Shortest Route</button>
+        <button onclick="compareAlgorithms()">Compare Algorithms</button>
+        <button class="secondary" onclick="resetNetwork()">Reset Network</button>
+
+        <div class="result" id="calcDetails">
+            Select source and destination, then calculate the route.
+        </div>
+
+        <div class="result" id="compareDetails">
+            Algorithm comparison will appear here.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Customize Link Costs</h3>
+        <p class="muted">
+            Change the cost of a network link and calculate the route again.
+        </p>
+        <div class="grid" id="costControls"></div>
+    </div>
+</section>
+
+<section id="failure">
+    <h2>2. Network Failure and Recovery</h2>
+
+    <div class="card">
+        <h3>Disconnect or Restore Network Links</h3>
+        <p>
+            A network link represents a connection between two routers.
+            Disconnecting a link can force packets to use another path.
+        </p>
+        <div id="failureControls"></div>
+
+        <h3 style="margin-top:20px">Router Status</h3>
+        <div id="routerControls"></div>
+
+        <div class="result" id="failureDetails">
+            Network is operating normally.
+        </div>
+    </div>
+</section>
+
+<section id="packets">
+    <h2>3. Packet Transmission Simulator</h2>
+
+    <div class="card">
+        <p>
+            Simulate the transmission of data packets through the selected
+            route. Packet loss is simulated randomly and does not represent
+            actual network traffic.
+        </p>
+
+        <div class="grid">
+            <div>
+                <label>Number of Packets</label>
+                <input type="number" id="packetCount" min="1" max="500" value="20">
+            </div>
+
+            <div>
+                <label>Packet Loss Percentage</label>
+                <input type="number" id="lossRate" min="0" max="100" value="10">
+            </div>
+
+            <div>
+                <label>Simulation Speed</label>
+                <select id="speed">
+                    <option value="100">Fast</option>
+                    <option value="500" selected>Normal</option>
+                    <option value="1000">Slow</option>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="startTransmission()">Start Transmission</button>
+        <button class="secondary" onclick="stopTransmission()">Stop</button>
+
+        <div class="result" id="packetDetails">
+            Waiting for packet transmission.
+        </div>
+
+        <div class="grid" style="margin-top:15px">
+            <div class="metric">
+                <strong id="sent">0</strong>
+                Packets Sent
+            </div>
+            <div class="metric">
+                <strong id="delivered">0</strong>
+                Packets Delivered
+            </div>
+            <div class="metric">
+                <strong id="dropped">0</strong>
+                Packets Dropped
+            </div>
+        </div>
+
+        <div class="result">
+            <h3>Transmission Log</h3>
+            <div id="packetLog">No packets transmitted yet.</div>
+        </div>
+    </div>
+</section>
+
+<section id="performance">
+    <h2>4. Network Performance Analyzer</h2>
+
+    <div class="card">
+        <p>
+            Analyze network connectivity, route cost, hop count and
+            packet delivery ratio.
+        </p>
+
+        <button onclick="analyzePerformance()">Analyze Network</button>
+
+        <div class="grid" style="margin-top:15px">
+            <div class="metric">
+                <strong id="availability">0%</strong>
+                Network Availability
+            </div>
+            <div class="metric">
+                <strong id="activeLinks">0</strong>
+                Active Links
+            </div>
+            <div class="metric">
+                <strong id="routeCost">-</strong>
+                Route Cost
+            </div>
+            <div class="metric">
+                <strong id="hopCount">-</strong>
+                Route Hops
+            </div>
+        </div>
+
+        <div class="result" id="performanceDetails">
+            Click Analyze Network to view performance.
+        </div>
+    </div>
+</section>
+
+</div>
+
+<footer>
+    <p>NetRescue | Computer Networks Mini Project</p>
+    <p>Interactive educational network simulation</p>
+</footer>
+
+<script>
+// ========================================
+// 1. NETWORK CONFIGURATION
+// ========================================
+
+const routerNames = ["R1","R2","R3","R4","R5","R6"];
+
+const positions = {
+    R1: [80,150],
+    R2: [210,60],
+    R3: [210,240],
+    R4: [390,60],
+    R5: [390,240],
+    R6: [560,150]
+};
+
+const originalLinks = [
+    {a:"R1",b:"R2",cost:4},
+    {a:"R1",b:"R3",cost:2},
+    {a:"R2",b:"R3",cost:1},
+    {a:"R2",b:"R4",cost:5},
+    {a:"R3",b:"R5",cost:4},
+    {a:"R4",b:"R5",cost:1},
+    {a:"R4",b:"R6",cost:3},
+    {a:"R5",b:"R6",cost:2}
+];
+
+let links = [];
+let routerStatus = {};
+let currentRoute = [];
+let transmissionTimer = null;
+let stopRequested = false;
+
+function resetData() {
+    links = originalLinks.map((link,index) => ({
+        ...link,
+        active:true,
+        id:index
+    }));
+
+    routerStatus = {};
+    routerNames.forEach(name => routerStatus[name] = true);
+
+    currentRoute = [];
+}
+
+resetData();
+
+// ========================================
+// 2. DRAW NETWORK
+// ========================================
+
+function drawNetwork() {
+    const edgeGroup = document.getElementById("edges");
+    const routerGroup = document.getElementById("routers");
+
+    edgeGroup.innerHTML = "";
+    routerGroup.innerHTML = "";
+
+    links.forEach(link => {
+        const [x1,y1] = positions[link.a];
+        const [x2,y2] = positions[link.b];
+
+        const isRoute = currentRoute.some((name,index) =>
+            index < currentRoute.length-1 &&
+            ((name === link.a && currentRoute[index+1] === link.b) ||
+             (name === link.b && currentRoute[index+1] === link.a))
+        );
+
+        const line = document.createElementNS(
+            "http://www.w3.org/2000/svg","line"
+        );
+
+        line.setAttribute("x1",x1);
+        line.setAttribute("y1",y1);
+        line.setAttribute("x2",x2);
+        line.setAttribute("y2",y2);
+
+        line.setAttribute(
+            "class",
+            "edge" +
+            (!link.active ? " failed" : "") +
+            (isRoute && link.active ? " route" : "")
+        );
+
+        line.addEventListener("click",() => toggleLink(link.id));
+
+        edgeGroup.appendChild(line);
+
+        const text = document.createElementNS(
+            "http://www.w3.org/2000/svg","text"
+        );
+
+        text.setAttribute("x",(x1+x2)/2);
+        text.setAttribute("y",(y1+y2)/2-8);
+        text.setAttribute("class","edge-label");
+        text.textContent = link.cost;
+
+        edgeGroup.appendChild(text);
+    });
+
+    routerNames.forEach(name => {
+        const [x,y] = positions[name];
+
+        const group = document.createElementNS(
+            "http://www.w3.org/2000/svg","g"
+        );
+
+        group.setAttribute(
+            "class","router" + (!routerStatus[name] ? " off" : "")
+        );
+
+        const circle = document.createElementNS(
+            "http://www.w3.org/2000/svg","circle"
+        );
+
+        circle.setAttribute("cx",x);
+        circle.setAttribute("cy",y);
+        circle.setAttribute("r",24);
+
+        const text = document.createElementNS(
+            "http://www.w3.org/2000/svg","text"
+        );
+
+        text.setAttribute("x",x);
+        text.setAttribute("y",y+5);
+        text.textContent = name;
+
+        group.appendChild(circle);
+        group.appendChild(text);
+        routerGroup.appendChild(group);
+    });
+}
+
+// ========================================
+// 3. BUILD ADJACENCY LIST
+// ========================================
+
+function getGraph() {
+    const graph = {};
+
+    routerNames.forEach(name => graph[name] = []);
+
+    links.forEach(link => {
+        if (
+            link.active &&
+            routerStatus[link.a] &&
+            routerStatus[link.b]
+        ) {
+            graph[link.a].push({
+                node:link.b,
+                cost:link.cost
+            });
+
+            graph[link.b].push({
+                node:link.a,
+                cost:link.cost
+            });
+        }
+    });
+
+    return graph;
+}
+
+// ========================================
+// 4. DIJKSTRA ALGORITHM
+// ========================================
+
+function dijkstra(source,destination) {
+    const graph = getGraph();
+
+    const distance = {};
+    const previous = {};
+    const visited = {};
+
+    routerNames.forEach(name => {
+        distance[name] = Infinity;
+        previous[name] = null;
+        visited[name] = false;
+    });
+
+    if (!graph[source] || !graph[destination]) return null;
+
+    distance[source] = 0;
+
+    for (let i=0;i<routerNames.length;i++) {
+        let current = null;
+        let minimum = Infinity;
+
+        routerNames.forEach(name => {
+            if (!visited[name] && distance[name] < minimum) {
+                minimum = distance[name];
+                current = name;
+            }
+        });
+
+        if (current === null) break;
+
+        visited[current] = true;
+
+        if (current === destination) break;
+
+        graph[current].forEach(edge => {
+            let newDistance = distance[current] + edge.cost;
+
+            if (newDistance < distance[edge.node]) {
+                distance[edge.node] = newDistance;
+                previous[edge.node] = current;
+            }
+        });
+    }
+
+    return buildResult(source,destination,distance,previous);
+}
+
+// ========================================
+// 5. BELLMAN-FORD ALGORITHM
+// ========================================
+
+function bellmanFord(source,destination) {
+    const distance = {};
+    const previous = {};
+
+    routerNames.forEach(name => {
+        distance[name] = Infinity;
+        previous[name] = null;
+    });
+
+    if (!routerStatus[source] || !routerStatus[destination]) return null;
+
+    distance[source] = 0;
+
+    const activeEdges = [];
+
+    links.forEach(link => {
+        if (
+            link.active &&
+            routerStatus[link.a] &&
+            routerStatus[link.b]
+        ) {
+            activeEdges.push({
+                a:link.a,
+                b:link.b,
+                cost:link.cost
+            });
+            activeEdges.push({
+                a:link.b,
+                b:link.a,
+                cost:link.cost
+            });
+        }
+    });
+
+    for (let i=0;i<routerNames.length-1;i++) {
+        let changed = false;
+
+        activeEdges.forEach(edge => {
+            if (
+                distance[edge.a] !== Infinity &&
+                distance[edge.a] + edge.cost < distance[edge.b]
+            ) {
+                distance[edge.b] = distance[edge.a] + edge.cost;
+                previous[edge.b] = edge.a;
+                changed = true;
+            }
+        });
+
+        if (!changed) break;
+    }
+
+    return buildResult(source,destination,distance,previous);
+}
+
+// ========================================
+// 6. BUILD ROUTE RESULT
+// ========================================
+
+function buildResult(source,destination,distance,previous) {
+    if (distance[destination] === Infinity) return null;
+
+    const path = [];
+    let current = destination;
+
+    while (current !== null) {
+        path.unshift(current);
+        current = previous[current];
+    }
+
+    if (path[0] !== source) return null;
+
+    return {
+        path:path,
+        cost:distance[destination]
+    };
+}
+
+function solve(source,destination,algorithm) {
+    if (source === destination) {
+        return routerStatus[source]
+            ? {path:[source],cost:0}
+            : null;
+    }
+
+    if (algorithm === "dijkstra") {
+        return dijkstra(source,destination);
+    }
+
+    return bellmanFord(source,destination);
+}
+
+// ========================================
+// 7. CALCULATE ROUTE
+// ========================================
+
+function calculateRoute() {
+    const source = document.getElementById("src").value;
+    const destination = document.getElementById("dst").value;
+    const algorithm = document.getElementById("algo").value;
+
+    const result = solve(source,destination,algorithm);
+
+    currentRoute = result ? result.path : [];
+
+    if (result) {
+        const steps = result.path.map((name,index) =>
+            "Step " + (index+1) + ": Router " + name
+        ).join("<br>");
+
+        document.getElementById("calcDetails").innerHTML =
+            "<h3 class='good'>Route Found Successfully!</h3>" +
+            "<p>Source: "+source+"</p>" +
+            "<p>Destination: "+destination+"</p>" +
+            "<p>Algorithm: "+algorithm+"</p>" +
+            "<p>Shortest Path: <b>"+result.path.join(" → ")+"</b></p>" +
+            "<p>Total Cost: <b>"+result.cost+"</b></p>" +
+            "<p>Number of Hops: <b>"+(result.path.length-1)+"</b></p>" +
+            "<hr><br>"+steps;
+    } else {
+        document.getElementById("calcDetails").innerHTML =
+            "<h3 class='bad'>No Route Available!</h3>" +
+            "The selected routers are disconnected.";
+    }
+
+    drawNetwork();
+}
+
+// ========================================
+// 8. COMPARE ALGORITHMS
+// ========================================
+
+function compareAlgorithms() {
+    const source = document.getElementById("src").value;
+    const destination = document.getElementById("dst").value;
+
+    const d = dijkstra(source,destination);
+    const b = bellmanFord(source,destination);
+
+    function format(result) {
+        if (!result) return "No route available";
+
+        return "Path: "+result.path.join(" → ") +
+            "<br>Cost: "+result.cost+
+            "<br>Hops: "+(result.path.length-1);
+    }
+
+    document.getElementById("compareDetails").innerHTML =
+        "<h3>Dijkstra Algorithm</h3>"+format(d)+
+        "<hr><h3>Bellman-Ford Algorithm</h3>"+format(b)+
+        "<hr><p><b>Comparison:</b> "+
+        (d && b && d.cost === b.cost
+            ? "Both algorithms found the same shortest route cost."
+            : "The algorithms returned different results or a route is unavailable.")
+        +"</p>";
+}
+
+// ========================================
+// 9. CUSTOMIZE LINK COSTS
+// ========================================
+
+function createCostControls() {
+    const container = document.getElementById("costControls");
+    container.innerHTML = "";
+
+    links.forEach(link => {
+        const div = document.createElement("div");
+
+        const label = document.createElement("label");
+        label.textContent = link.a+" - "+link.b;
+
+        const input = document.createElement("input");
+        input.type = "number";
+        input.min = "1";
+        input.max = "100";
+        input.value = link.cost;
+
+        input.addEventListener("change",() => {
+            const value = Number(input.value);
+
+            if (!Number.isFinite(value) || value < 1 || value > 100) {
+                input.value = link.cost;
+                return;
+            }
+
+            link.cost = value;
+            currentRoute = [];
+            drawNetwork();
+        });
+
+        div.appendChild(label);
+        div.appendChild(input);
+        container.appendChild(div);
+    });
+}
+
+// ========================================
+// 10. FAILURE AND RECOVERY
+// ========================================
+
+function createFailureControls() {
+    const container = document.getElementById("failureControls");
+    container.innerHTML = "";
+
+    links.forEach(link => {
+        const button = document.createElement("button");
+
+        button.textContent =
+            link.a+"-"+link.b+
+            (link.active ? " Disconnect" : " Restore");
+
+        button.className = link.active ? "danger" : "success";
+
+        button.onclick = () => toggleLink(link.id);
+
+        container.appendChild(button);
+    });
+}
+
+function toggleLink(id) {
+    const link = links.find(item => item.id === id);
+    if (!link) return;
+
+    link.active = !link.active;
+    currentRoute = [];
+
+    document.getElementById("failureDetails").innerHTML =
+        link.active
+        ? "<p class='good'>Connection "+link.a+"-"+link.b+" restored.</p>"
+        : "<p class='bad'>Connection "+link.a+"-"+link.b+" disconnected.</p>";
+
+    updateInterface();
+}
+
+function createRouterControls() {
+    const container = document.getElementById("routerControls");
+    container.innerHTML = "";
+
+    routerNames.forEach(name => {
+        const button = document.createElement("button");
+
+        button.textContent =
+            name+(routerStatus[name] ? " Switch OFF" : " Switch ON");
+
+        button.className = routerStatus[name] ? "danger" : "success";
+
+        button.onclick = () => {
+            routerStatus[name] = !routerStatus[name];
+            currentRoute = [];
+
+            document.getElementById("failureDetails").innerHTML =
+                name+" is now "+(routerStatus[name] ? "ONLINE" : "OFFLINE");
+
+            updateInterface();
+        };
+
+        container.appendChild(button);
+    });
+}
+
+function updateInterface() {
+    createFailureControls();
+    createRouterControls();
+    drawNetwork();
+}
+
+// ========================================
+// 11. RESET NETWORK
+// ========================================
+
+function resetNetwork() {
+    stopTransmission();
+    resetData();
+
+    currentRoute = [];
+
+    document.getElementById("calcDetails").innerHTML =
+        "Network reset. Calculate a new route.";
+
+    document.getElementById("compareDetails").innerHTML =
+        "Click Compare to compare both algorithms.";
+
+    document.getElementById("failureDetails").innerHTML =
+        "<p class='good'>All routers and links restored.</p>";
+
+    createCostControls();
+    updateInterface();
+}
+
+// ========================================
+// 12. PACKET TRANSMISSION
+// ========================================
+
+function startTransmission() {
+    stopTransmission();
+    stopRequested = false;
+
+    const count = Number(document.getElementById("packetCount").value);
+    const loss = Number(document.getElementById("lossRate").value);
+    const speed = Number(document.getElementById("speed").value);
+
+    if (!Number.isInteger(count) || count < 1 || count > 500) {
+        alert("Enter a packet count between 1 and 500.");
+        return;
+    }
+
+    if (!Number.isFinite(loss) || loss < 0 || loss > 100) {
+        alert("Enter packet loss between 0 and 100.");
+        return;
+    }
+
+    const source = document.getElementById("src").value;
+    const destination = document.getElementById("dst").value;
+
+    const result = dijkstra(source,destination);
+
+    if (!result) {
+        document.getElementById("packetDetails").innerHTML =
+            "<p class='bad'>Transmission failed. No available route.</p>";
+        return;
+    }
+
+    let sent = 0;
+    let delivered = 0;
+    let dropped = 0;
+
+    document.getElementById("packetLog").innerHTML = "";
+    document.getElementById("sent").textContent = 0;
+    document.getElementById("delivered").textContent = 0;
+    document.getElementById("dropped").textContent = 0;
+
+    document.getElementById("packetDetails").innerHTML =
+        "Transmitting from "+source+" to "+destination+
+        "<br>Route: "+result.path.join(" → ");
+
+    function sendOne() {
+        if (stopRequested) return;
+
+        if (sent >= count) {
+            document.getElementById("packetDetails").innerHTML +=
+                "<br><b class='good'>Transmission completed.</b>";
+            analyzePerformance();
+            return;
+        }
+
+        sent++;
+
+        const lost = Math.random()*100 < loss;
+
+        if (lost) {
+            dropped++;
+        } else {
+            delivered++;
+        }
+
+        document.getElementById("sent").textContent = sent;
+        document.getElementById("delivered").textContent = delivered;
+        document.getElementById("dropped").textContent = dropped;
+
+        const entry = document.createElement("p");
+        entry.className = lost ? "bad" : "good";
+
+        entry.textContent =
+            "Packet "+sent+": "+
+            (lost ? "DROPPED" : "DELIVERED")+
+            " | Route: "+result.path.join(" → ");
+
+        const log = document.getElementById("packetLog");
+        log.prepend(entry);
+
+        if (sent < count) {
+            transmissionTimer = setTimeout(sendOne,speed);
+        } else {
+            document.getElementById("packetDetails").innerHTML +=
+                "<br><b class='good'>Transmission completed.</b>";
+            analyzePerformance();
+        }
+    }
+
+    sendOne();
+}
+
+function stopTransmission() {
+    stopRequested = true;
+
+    if (transmissionTimer !== null) {
+        clearTimeout(transmissionTimer);
+        transmissionTimer = null;
+    }
+}
+
+// ========================================
+// 13. PERFORMANCE ANALYZER
+// ========================================
+
+function analyzePerformance() {
+    const activeRouterCount =
+        routerNames.filter(name => routerStatus[name]).length;
+
+    const availability =
+        (activeRouterCount/routerNames.length)*100;
+
+    const activeLinkCount =
+        links.filter(link =>
+            link.active &&
+            routerStatus[link.a] &&
+            routerStatus[link.b]
+        ).length;
+
+    const source = document.getElementById("src").value;
+    const destination = document.getElementById("dst").value;
+
+    const result = dijkstra(source,destination);
+
+    const sent = Number(document.getElementById("sent").textContent);
+    const delivered = Number(document.getElementById("delivered").textContent);
+    const dropped = Number(document.getElementById("dropped").textContent);
+
+    const deliveryRatio =
+        sent > 0 ? (delivered/sent)*100 : 0;
+
+    document.getElementById("availability").textContent =
+        availability.toFixed(1)+"%";
+
+    document.getElementById("activeLinks").textContent =
+        activeLinkCount;
+
+    document.getElementById("routeCost").textContent =
+        result ? result.cost : "N/A";
+
+    document.getElementById("hopCount").textContent =
+        result ? result.path.length-1 : "N/A";
+
+    document.getElementById("performanceDetails").innerHTML =
+        "<h3>Network Analysis Report</h3>"+
+        "<p>Active routers: "+activeRouterCount+
+        " / "+routerNames.length+"</p>"+
+        "<p>Active links: "+activeLinkCount+
+        " / "+links.length+"</p>"+
+        "<p>Router availability: "+availability.toFixed(2)+"%</p>"+
+        "<p>Route status: "+(result ? "Available" : "Unavailable")+"</p>"+
+        "<p>Packet delivery ratio: "+deliveryRatio.toFixed(2)+"%</p>"+
+        "<p>Packets delivered: "+delivered+"</p>"+
+        "<p>Packets dropped: "+dropped+"</p>"+
+        "<p>Link utilization: "+
+        (links.length ? (activeLinkCount/links.length*100).toFixed(2) : 0)+
+        "% (active links / configured links)</p>"+
+        "<p class='muted'>These are educational simulation metrics, not live network measurements.</p>";
+}
+
+// ========================================
+// 14. INITIALIZE WEBSITE
+// ========================================
+
+createCostControls();
+createFailureControls();
+createRouterControls();
+drawNetwork();
+
+analyzePerformance();
+
+</script>
+
+</body>
+</html>
